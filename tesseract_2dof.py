@@ -1,55 +1,55 @@
 import numpy as np
 import matplotlib.pyplot as plt
-##LİSTELER
+##Lists
 ZList = []
 XList = []
-##BAŞLANGIÇ KOŞULLARI
+##Initial positions
 X = 0  # [m]
 Y = 0  # [m]
-baslangicZ = 0
-Z = baslangicZ  # [m]
-gX = 0  # x yönünde yer çekimi ivmesi [m/s^2]
-gZ = -9.801  # z yönünde yer çekimi ivmesi [m/s^2]
-hiz = 100  # [m/s]
-aci = 70 * (np.pi/180)  # [radyan]
-hizX = hiz * np.cos(aci)  # x yönündeki hız [m/s]
-hizZ = hiz * np.sin(aci)  # z yönündeki hız [m/s]
-zaman = 0.0  # [s]
-dt = 0.01  # similasyon zaman adımı [s]
-maxzaman = 100
-maxZ = 0  # başlangıçta irtifa (zamana bağlı güncellenecektir)
-while zaman < maxzaman and Z >= baslangicZ:
-    ##HIZ
-    hizX = hizX + gX * dt
-    hizZ = hizZ + gZ * dt
-    hiz = np.sqrt(hizX**2 + hizZ**2)
-    ##KONUM
-    X = X + hizX * dt + 0.5 * gX * dt**2
-    Z = Z + hizZ * dt + 0.5 * gZ * dt**2
-    ##AÇI
-    aci = np.arctan(hizZ/hizX)
-    aci = aci * (180/np.pi)
-    ##MAX DEĞERLERİN GÜNCELLENMESİ
+startZ = 0
+Z = startZ  # [m]
+gX = 0  # gravity in x [m/s^2]
+gZ = -9.801  # gravity in z [m/s^2]
+vel = 100  # [m/s]
+ang = 70 * (np.pi/180)  # [rad]
+velX = vel * np.cos(ang)  # vel in x [m/s]
+velZ = vel * np.sin(ang)  # vel in z [m/s]
+time = 0.0  # [s]
+dt = 0.01  # time step [s]
+maxtime = 100
+maxZ = 0  # initial pos in z (updated depending on time)
+while time < maxtime and Z >= startZ:
+    ##Velocity calculations
+    velX = velX + gX * dt
+    velZ = velZ + gZ * dt
+    vel = np.sqrt(velX**2 + velZ**2)
+    ##Position calculations
+    X = X + velX * dt + 0.5 * gX * dt**2
+    Z = Z + velZ * dt + 0.5 * gZ * dt**2
+    ##Angle calculations
+    ang = np.arctan(velZ/velX)
+    ang = ang * (180/np.pi)
+    ##Update max values
     if Z >= maxZ:
         maxZ = Z
         maxX = X
-        zamanApogee = zaman
-        hizApogee = hiz
+        timeApogee = time
+        velApogee = vel
         apogeeZ = Z
     ZList.append(Z)
     XList.append(X)
-    zaman += dt
+    time += dt
 
-print("Tepe Noktası Yüksekliği: " + str(np.round(apogeeZ, decimals=2)) + ' m')
-print("Tepe Noktası Hızı: " + str(np.round(hizApogee, decimals=2)) + ' m/s')
-print("Tepe Noktası Zamanı: " + str(np.round(zamanApogee, decimals=2)) + ' s')
-print("Son Pozisyon: " + str(np.round([X,Y,abs(np.round(Z))], decimals=2)) + ' m')
-print("Son Uçuş Yolu Hızı: " + str(np.round(hiz, decimals=2)) + ' m/s')
-print("Son Uçuş Yolu Açısı: " + str(np.round(aci, decimals=2)) + ' derece')
-print("Son Uçuş Zamanı: " + str(np.round(zaman, decimals=2)) + ' s')
+print("Apooge position: " + str(np.round(apogeeZ, decimals=2)) + ' m')
+print("Apogee velocity: " + str(np.round(velApogee, decimals=2)) + ' m/s')
+print("Apogee time: " + str(np.round(timeApogee, decimals=2)) + ' s')
+print("Last position: " + str(np.round([X,Y,abs(np.round(Z))], decimals=2)) + ' m')
+print("Last velocity: " + str(np.round(vel, decimals=2)) + ' m/s')
+print("Last angle: " + str(np.round(ang, decimals=2)) + ' degree')
+print("Last time: " + str(np.round(time, decimals=2)) + ' s')
 
 plt.plot(XList, ZList, 'k-', lw=2)
-plt.xlabel("Menzil [m]")
+plt.xlabel("Range [m]")
 plt.ylabel("Yükseklik [m]")
 plt.title("Uçuş Profili")
 plt.grid()
